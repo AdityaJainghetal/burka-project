@@ -192,7 +192,7 @@ const CreateProduct = () => {
           {/* Price */}
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-              Price (₹)*
+             Main Price (₹)*
             </label>
             <input
               type="number"
@@ -211,7 +211,7 @@ const CreateProduct = () => {
           {/* MRP */}
           <div>
             <label htmlFor="mrp" className="block text-sm font-medium text-gray-700 mb-1">
-              MRP (₹)*
+             Real MRP (₹)*
             </label>
             <input
               type="number"

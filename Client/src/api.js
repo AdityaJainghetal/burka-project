@@ -14,6 +14,8 @@ export const deleteProduct = (id) => API.delete(`/product/${id}`)
 export const addProductToCart = (productId) => API.post(`/cart/add/${productId}`)
 
 export const Registration= ()=>API.post("/register")
+export const fetchRegistration= ()=>API.get("/display")
+
 // Category and subcategory endpoints
 export const fetchcategory = () => API.get("/category")
 export const addCategory = (name) => API.post("/category", { name })
