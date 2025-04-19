@@ -8,9 +8,6 @@ const productSchema = new mongoose.Schema({
     barcode: {
         type: String,
     },
-    mrp: {
-        type: String,
-    },
     price: {
         type: String
     },

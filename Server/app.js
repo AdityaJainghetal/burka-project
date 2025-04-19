@@ -28,4 +28,6 @@ app.use('/category', categoryRouter)
 app.use('/subcategory', subacategoryRouter);
 app.use("/user", UserRegistration)
 
-app.listen(8080)
+app.listen(8080, () => {
+    console.log("Server is running on port 8080");
+})

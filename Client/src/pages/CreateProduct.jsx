@@ -8,7 +8,6 @@ const CreateProduct = () => {
   const [formData, setFormData] = useState({
     name: "",
     price: "",
-    mrp: "",
     description: "",
     color: "",
     fabric: "",
@@ -31,8 +30,6 @@ const CreateProduct = () => {
     const fetchCategories = async () => {
       setLoading(true)
       try {
-        // This would be replaced with actual API call
-        // Simulating API response
         const response = await fetchcategory();
         if (response.data) {
           setCategories(response.data)
@@ -53,7 +50,6 @@ const CreateProduct = () => {
       if (!formData.category) return
 
       try {
-        // This would be replaced with actual API calls filtered by category
         const fetchSubcategories = async () => {
           const response = await fetchSubcategory();
           if (response.data) {
@@ -122,7 +118,7 @@ const CreateProduct = () => {
       // Create FormData object for file uploads
       const productData = new FormData()
 
-      // Add all form fields
+      // Add all form fields except mrp
       Object.keys(formData).forEach((key) => {
         if (key === "size") {
           productData.append(key, JSON.stringify(formData[key]))
@@ -143,7 +139,6 @@ const CreateProduct = () => {
       setFormData({
         name: "",
         price: "",
-        mrp: "",
         description: "",
         color: "",
         fabric: "",
@@ -192,7 +187,7 @@ const CreateProduct = () => {
           {/* Price */}
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-             Main Price (₹)*
+             Price (₹)*
             </label>
             <input
               type="number"
@@ -200,25 +195,6 @@ const CreateProduct = () => {
               name="price"
               placeholder="0.00"
               value={formData.price}
-              onChange={handleChange}
-              required
-              step="0.01"
-              min="0"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
-
-          {/* MRP */}
-          <div>
-            <label htmlFor="mrp" className="block text-sm font-medium text-gray-700 mb-1">
-             Real MRP (₹)*
-            </label>
-            <input
-              type="number"
-              id="mrp"
-              name="mrp"
-              placeholder="0.00"
-              value={formData.mrp}
               onChange={handleChange}
               required
               step="0.01"

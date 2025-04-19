@@ -6,5 +6,6 @@ const userControler   = require('../controllers/RegitrationController');// Ensur
 // Define the registration route
 router.post('/register', userControler.Registration ); // Explicitly define the route for registration
 router.post('/login', userControler.Login); // Explicitly define the route for registration
+router.get('/', userControler.getAllUsers)
 
 module.exports = router;

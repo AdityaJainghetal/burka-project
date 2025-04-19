@@ -25,15 +25,16 @@ function AppContent() {
   const { cart } = useCart() // Fetch cart quantity from CartContext
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex  bg-gray-50">
      <header className="bg-white shadow-sm">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="flex justify-between h-16 items-center">
+     
+      {/* Only keep Cart icon in top navbar */}
+      <div className="hidden md:flex items-center space-x-4">
       <div className="flex-shrink-0 flex items-center">
         <h1 className="text-xl font-bold text-primary-600">ProductScan</h1>
       </div>
-      {/* Only keep Cart icon in top navbar */}
-      <div className="hidden md:flex items-center space-x-4">
         <NavLink
           to="/cart"
           className={({ isActive }) =>
@@ -56,7 +57,7 @@ function AppContent() {
 </header>
 
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className=" mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <Routes>
             <Route path="/" element={<ProductList />} />

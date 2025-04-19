@@ -65,7 +65,6 @@ const createProduct = async (req, res) => {
       const newProduct = new Product({
         name,
         price,
-        mrp,
         description,
         color,
         fabric,
