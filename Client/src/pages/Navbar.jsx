@@ -74,6 +74,8 @@ const navItems = [
   { to: "/create", label: "Add Product", icon: PlusCircle },
   { to: "/registration", label: "Registration", icon: UserPlus },
   { to: "/login", label: "Login", icon: LogIn },
+  { to: "/orders", label: "Orders", icon: LayoutGrid },
+
 ];
 
 const Sidbar = () => {
@@ -123,7 +125,9 @@ const Sidbar = () => {
             : "hidden md:block md:w-64 md:fixed md:top-16 md:left-0 md:h-[calc(100%-4rem)]"
         }`}
       >
+
         <div className="p-4 h-full flex flex-col">
+          
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Menu</h2>
           <nav className="flex-1 flex flex-col space-y-2 overflow-y-auto">
             {navItems.map(({ to, label, icon: Icon }) => (

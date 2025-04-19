@@ -31,7 +31,7 @@ const CartPage = () => {
   // Initialize quantities
   useEffect(() => {
     const initial = {};
-    cart.forEach((item) => {
+    cart.forEach(item => {
       initial[item._id] = item.quantity;
     });
     setEditedQuantities(initial);
@@ -55,7 +55,7 @@ const CartPage = () => {
 
   // Apply vendor discount
   useEffect(() => {
-    const vendor = vendors.find((v) => v._id === selectedVendor);
+    const vendor = vendors.find(v => v._id === selectedVendor);
     setDiscount(vendor?.discount || 0);
   }, [selectedVendor, vendors]);
 
@@ -77,14 +77,11 @@ const CartPage = () => {
     doc.text("Invoice", 10, 10);
 
     const cols = ["Product", "Price", "Qty", "Subtotal"];
-    const rows = cart.map((item) => [
+    const rows = cart.map(item => [
       item.product.name,
       `₹${item.product.price}`,
       editedQuantities[item._id],
-      `₹${(
-        item.product.price *
-        editedQuantities[item._id]
-      ).toFixed(2)}`,
+      `₹${(item.product.price * editedQuantities[item._id]).toFixed(2)}`
     ]);
 
     autoTable(doc, { head: [cols], body: rows, startY: 20 });
@@ -104,19 +101,19 @@ const CartPage = () => {
   // Change quantity
   const handleQuantityChange = (id, qty) => {
     if (qty < 1) return;
-    setEditedQuantities((prev) => ({ ...prev, [id]: qty }));
+    setEditedQuantities(prev => ({ ...prev, [id]: qty }));
   };
 
   // Remove single item
-  const handleDelete = async (id) => {
-    setItemsBeingDeleted((prev) => ({ ...prev, [id]: true }));
+  const handleDelete = async id => {
+    setItemsBeingDeleted(prev => ({ ...prev, [id]: true }));
     try {
       await axios.delete(`http://localhost:8080/cart/remove/${id}`);
       await fetchCart();
     } catch {
       setError("Failed to delete.");
     } finally {
-      setItemsBeingDeleted((prev) => ({ ...prev, [id]: false }));
+      setItemsBeingDeleted(prev => ({ ...prev, [id]: false }));
     }
   };
 
@@ -124,31 +121,61 @@ const CartPage = () => {
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
 
-  // Process payment and clear cart
-  const handlePayment = () => {
+  // Process payment and create order
+  const handlePayment = async () => {
     setProcessingPayment(true);
     setError(null);
 
-    setTimeout(() => {
-      setProcessingPayment(false);
-      setPaymentSuccess(true);
+    // build order payload
+    const payload = {
+      orderItems: cart.map(item => ({
+        productId: item.product._id,
+        productName: item.product.name,
+        price: item.product.price,
+        quantity: editedQuantities[item._id],
+        productImage: item?.product?.images[0],
+        discountName: vendors.find(v => v._id === selectedVendor)?.firmName || "",
+        discountPercentage: discount,
+        priceAfterDiscount: item.product.price - (item.product.price * discount / 100),
+      })),
+      totalPrice: subtotal,
+      totalPriceAfterDiscount: total,
+      
+    };
 
-      // Remove all items after success
-      Promise.all(
-        cart.map((item) =>
-          axios.delete(
-            `http://localhost:8080/cart/remove/${item.product._id}`
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/order",
+        payload
+      );
+
+      if (res.data.success) {
+        setPaymentSuccess(true);
+
+        // On success: clear cart
+        await Promise.all(
+          cart.map(item =>
+            axios.delete(
+              `http://localhost:8080/cart/remove/${item.product._id}`
+            )
           )
-        )
-      )
-        .then(() => fetchCart())
-        .finally(() => {
-          setTimeout(() => {
-            closeModal();
-            setCheckoutDone(true);
-          }, 1000);
-        });
-    }, 2000);
+        );
+        await fetchCart();
+
+        // close modal & enable invoice download
+        setTimeout(() => {
+          closeModal();
+          setCheckoutDone(true);
+        }, 1000);
+      } else {
+        setError("Order creation failed.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Payment or order failed. Please try again.");
+    } finally {
+      setProcessingPayment(false);
+    }
   };
 
   return (
@@ -180,7 +207,7 @@ const CartPage = () => {
         <>
           {/* Cart Items */}
           <div className="space-y-4">
-            {cart.map((item) => (
+            {cart.map(item => (
               <div
                 key={item._id}
                 className="border rounded shadow-sm p-4 flex flex-col sm:flex-row justify-between gap-4"
@@ -208,7 +235,7 @@ const CartPage = () => {
                     <input
                       type="number"
                       value={editedQuantities[item._id]}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleQuantityChange(
                           item._id,
                           parseInt(e.target.value) || 1
@@ -232,20 +259,14 @@ const CartPage = () => {
                 </div>
                 <div className="flex flex-col items-end justify-between">
                   <p className="font-medium text-lg">
-                    ₹
-                    {(
-                      item.product.price *
-                      editedQuantities[item._id]
-                    ).toFixed(2)}
+                    ₹{(item.product.price * editedQuantities[item._id]).toFixed(2)}
                   </p>
                   <button
                     onClick={() => handleDelete(item.product._id)}
                     disabled={itemsBeingDeleted[item._id]}
                     className="mt-2 px-3 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 disabled:opacity-50"
                   >
-                    {itemsBeingDeleted[item._id]
-                      ? "Removing..."
-                      : "Remove"}
+                    {itemsBeingDeleted[item._id] ? "Removing..." : "Remove"}
                   </button>
                 </div>
               </div>
@@ -255,18 +276,14 @@ const CartPage = () => {
           {/* Summary & Actions */}
           <div className="mt-6 border rounded shadow-sm p-4">
             <div className="mb-4">
-              <label className="block text-sm mb-1">
-                Select Vendor
-              </label>
+              <label className="block text-sm mb-1">Select Vendor</label>
               <select
                 value={selectedVendor}
-                onChange={(e) =>
-                  setSelectedVendor(e.target.value)
-                }
+                onChange={e => setSelectedVendor(e.target.value)}
                 className="w-full border rounded px-4 py-2"
               >
                 <option value="">Select a vendor</option>
-                {vendors.map((v) => (
+                {vendors.map(v => (
                   <option key={v._id} value={v._id}>
                     {v.firmName}
                   </option>
@@ -281,11 +298,10 @@ const CartPage = () => {
                 className="w-full border rounded bg-gray-100 px-4 py-2"
               />
               {discount > 0 && (
-                <p className="text-green-600 text-sm mt-1">
-                  {discount}% applied!
-                </p>
+                <p className="text-green-600 text-sm mt-1">{discount}% applied!</p>
               )}
             </div>
+
             <div className="flex justify-between py-1">
               <span>Subtotal</span>
               <span>₹{subtotal.toFixed(2)}</span>
@@ -331,64 +347,65 @@ const CartPage = () => {
 
       {/* Payment Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white rounded-2xl shadow p-6 max-w-md w-full">
-            <h2 className="text-xl font-semibold mb-4">
-              Confirm Payment
-            </h2>
+  <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+    <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full">
+      <h2 className="text-2xl font-bold mb-4 text-center">Confirm Your Order</h2>
 
-            <div className="space-y-2 mb-4 text-sm">
-              {cart.map((item) => (
-                <div
-                  key={item._id}
-                  className="flex justify-between"
-                >
-                  <span>
-                    {item.product.name} (x{editedQuantities[item._id]})
-                  </span>
-                  <span>
-                    ₹
-                    {(
-                      item.product.price *
-                      editedQuantities[item._id]
-                    ).toFixed(2)}
-                  </span>
-                </div>
-              ))}
-              <hr />
-              <div className="flex justify-between font-medium">
-                <span>Total:</span>
-                <span>₹{total.toFixed(2)}</span>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={closeModal}
-                disabled={processingPayment}
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handlePayment}
-                disabled={processingPayment}
-                className="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 flex items-center"
-              >
-                {processingPayment
-                  ? "Processing..."
-                  : paymentSuccess
-                  ? "Payment Success"
-                  : "Pay"}
-              </button>
-            </div>
+      <div className="space-y-2 mb-4 text-sm text-gray-700">
+        {cart.map(item => (
+          <div key={item._id} className="flex justify-between">
+            <span>{item.product.name} (x{editedQuantities[item._id]})</span>
+            <span>
+              ₹{(item.product.price * editedQuantities[item._id]).toFixed(2)}
+            </span>
           </div>
+        ))}
+        <hr className="my-2" />
+        {discount > 0 && (
+          <div className="flex justify-between">
+            <span className="text-green-600 font-medium">Discount ({discount}% - {vendors.find(v => v._id === selectedVendor)?.firmName})</span>
+            <span className="text-green-600">-₹{discountAmount.toFixed(2)}</span>
+          </div>
+        )}
+        <div className="flex justify-between font-semibold text-lg">
+          <span>Total</span>
+          <span>₹{total.toFixed(2)}</span>
         </div>
-      )}
+      </div>
+
+      {/* Buttons */}
+      <div className="mt-6 flex justify-end gap-3">
+        <button
+          onClick={closeModal}
+          disabled={processingPayment}
+          className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-gray-700"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handlePayment}
+          disabled={processingPayment}
+          className={`px-4 py-2 rounded text-white flex items-center justify-center ${
+            processingPayment
+              ? "bg-yellow-500 cursor-not-allowed"
+              : paymentSuccess
+              ? "bg-green-600"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          {processingPayment
+            ? "Processing..."
+            : paymentSuccess
+            ? "Payment Success"
+            : "Pay Now"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
 
 export default CartPage;
-
-

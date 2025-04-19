@@ -10,6 +10,7 @@ import SubCategoryManagement from "./pages/SubCategory"
 import Registration from "./pages/Registration"
 import Login from "./pages/Login"
 import Sidbar from "./pages/Navbar"
+import Orders from "./pages/Orders"
 
 function App() {
   return (
@@ -67,6 +68,7 @@ function AppContent() {
             <Route path="/categories" element={<CategoryManagement />} />
             <Route path="/subcategories" element={<SubCategoryManagement />} />
             <Route path="/registration" element={<Registration/>}/>
+            <Route path="/orders" element={<Orders />} />       
             <Route path="/login" element={<Login/>}/>
           </Routes>
         </div>
