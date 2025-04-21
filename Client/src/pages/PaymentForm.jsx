@@ -1,49 +1,63 @@
-// PaymentForm.jsx
 import { useState } from 'react';
 import axios from 'axios';
 
-const PaymentForm = ({ orderId, totalAmount, paidAmount, onPaymentSuccess }) => {
+const PaymentForm = ({ orderId, totalAmount, dueAmount, onPaymentSuccess }) => {
   const [formData, setFormData] = useState({
     amount: '',
     receivingDate: '',
     paymentMode: 'Online Transfer',
-    remark: ''
+    remark: '',
   });
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
+    setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate amount
+    if (!formData.amount ) {
+      setError('Please enter a valid amount');
+      return;
+    }
+
+    if (formData.amount > dueAmount) {
+      setError(`Amount cannot exceed due amount (₹${dueAmount})`);
+      return;
+    }
+
     try {
-      const res = await axios.post(
-        `http://localhost:8080/payments`,
-        { ...formData, orderId }
-      );
-      
-      onPaymentSuccess(res.data);
+      const res = await axios.post('http://localhost:8080/payments', {
+        ...formData,
+        orderId,
+      });
+
+      onPaymentSuccess(res.data.payment);
       setFormData({
         amount: '',
         receivingDate: '',
         paymentMode: 'Online Transfer',
-        remark: ''
+        remark: '',
       });
     } catch (err) {
       console.error('Error submitting payment:', err);
+      setError('Failed to submit payment. Please try again.');
     }
   };
-
-  const balanceDue = totalAmount - paidAmount;
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mb-8">
       <h2 className="text-xl font-semibold mb-4">Add Payment</h2>
-      <p className="text-sm text-gray-600 mb-4">Balance Due: ₹{balanceDue}</p>
+      <p className="text-sm text-gray-600 mb-4">Balance Due: ₹{dueAmount.toLocaleString()}</p>
+
+      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -57,7 +71,7 @@ const PaymentForm = ({ orderId, totalAmount, paidAmount, onPaymentSuccess }) => 
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="Enter Amount"
               required
-              max={balanceDue}
+              max={dueAmount+1}
             />
           </div>
           <div>

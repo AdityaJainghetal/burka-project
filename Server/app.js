@@ -11,6 +11,7 @@ const subacategoryRouter = require("./routes/subcategory.routes")
 const fileUpload = require('express-fileupload');
 const UserRegistration = require("./routes/RegistartionRoute");
 const orderRouter = require("./routes/order.routes");
+const paymentRouter = require("./routes/payment.routes");
 // app.use(morgan('dev'))
 app.use(cors())
 
@@ -29,6 +30,7 @@ app.use('/category', categoryRouter)
 app.use('/subcategory', subacategoryRouter);
 app.use("/user", UserRegistration)
 app.use("/order", orderRouter)
+app.use("/payments", paymentRouter)
 
 app.listen(8080, () => {
     console.log("Server is running on port 8080");

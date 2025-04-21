@@ -1,54 +1,32 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const orderSchema = new mongoose.Schema(
-  {
-    orderItems: [
-      {
-        productName: {
-          type: String,
-          required: true,
-        },
-        productImage: {
-          type: String,
-          required: true,
-        },
-        productId: {
-          type: String,
-          required: true,
-        },
-        quantity: {
-          type: Number,
-          required: true,
-        },
-        price: {
-          type: Number,
-          required: true,
-        },
-        discountName: {
-          type: String,
-        },
-        discountPercentage: {
-          type: Number,
-          default: 0,
-        },
-        priceAfterDiscount: {
-          type: Number,
-          required: true,
-        },
-      },
-    ],
-    totalPrice: {
-      type: Number,
-      required: true,
+const orderSchema = new mongoose.Schema({
+  orderItems: [
+    {
+      productName: String,
+      price: Number,
+      quantity: Number,
+      productImage: String,
+      priceAfterDiscount: Number,
     },
-    totalPriceAfterDiscount: {
-      type: Number,
-      required: true,
-    },
+  ],
+  totalPrice: Number,
+  totalPriceAfterDiscount: Number,
+  dueAmount: Number,
+  discountName: String,
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'partially_paid', 'paid'],
+    default: 'pending',
   },
-  {
-    timestamps: true, // Adds createdAt and updatedAt fields
-  }
-);
+  payments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Payment',
+    },
+  ],
+}, {
+  timestamps: true,
+});
 
-module.exports = mongoose.model("Order", orderSchema);
+module.exports = mongoose.model('Order', orderSchema);
