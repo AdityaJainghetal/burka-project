@@ -11,7 +11,9 @@ import Registration from "./pages/Registration"
 import Login from "./pages/Login"
 import Sidbar from "./pages/Navbar"
 import Orders from "./pages/Orders"
-
+import AllPayment from "./pages/Allpayment"
+import { MdOutlinePayments } from "react-icons/md";
+import PaymentDetail from "./pages/Paymentdetail"
 function App() {
   return (
     <CartProvider>
@@ -28,12 +30,12 @@ function AppContent() {
   return (
     <div className="min-h-screen flex  bg-gray-50">
      <header className="bg-white shadow-sm">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div className="w-[100%] bg-red-50 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="flex justify-between h-16 items-center">
      
       {/* Only keep Cart icon in top navbar */}
-      <div className="hidden md:flex items-center space-x-4">
-      <div className="flex-shrink-0 flex items-center">
+      <div className=" hidden md:flex items-center space-x-4">
+      <div className=" flex-shrink-0 flex items-center">
         <h1 className="text-xl font-bold text-primary-600">ProductScan</h1>
       </div>
         <NavLink
@@ -58,7 +60,7 @@ function AppContent() {
 </header>
 
 
-      <main className=" mx-auto py-6 sm:px-6 lg:px-8">
+      <main className=" w-[100%] py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <Routes>
             <Route path="/" element={<ProductList />} />
@@ -70,6 +72,9 @@ function AppContent() {
             <Route path="/registration" element={<Registration/>}/>
             <Route path="/orders" element={<Orders />} />       
             <Route path="/login" element={<Login/>}/>
+            <Route path="/allpayment/:id" element={<AllPayment/>}/>
+            <Route path="/paymentdetail" element={<PaymentDetail/>}/>
+
           </Routes>
         </div>
       </main>
@@ -109,6 +114,11 @@ function AppContent() {
             <PlusCircle size={24} />
             <span className="text-xs mt-1">Add</span>
           </NavLink>
+
+
+
+
+
           <NavLink
             to="/categories"
             className={({ isActive }) =>
@@ -120,6 +130,41 @@ function AppContent() {
             <Layers size={24} />
             <span className="text-xs mt-1">Categories</span>
           </NavLink>
+
+
+
+
+          <NavLink
+            to="/paymentdetail"
+            className={({ isActive }) =>
+              isActive
+                ? "text-primary-600 flex flex-col items-center py-2 px-3"
+                : "text-gray-500 hover:text-gray-700 flex flex-col items-center py-2 px-3"
+            }
+          >
+            <Layers size={24} />
+            <span className="text-xs mt-1">PaymentDetail</span>
+          </NavLink>
+
+
+
+
+
+
+
+          <NavLink
+            to="/allpayment"
+            className={({ isActive }) =>
+              isActive
+                ? "text-primary-600 flex flex-col items-center py-2 px-3"
+                : "text-gray-500 hover:text-gray-700 flex flex-col items-center py-2 px-3"
+            }
+          >
+            <MdOutlinePayments size={24} />
+            <span className="text-xs mt-1">All payment</span>
+          </NavLink>
+
+          
           {/* Cart Link for Mobile */}
           <NavLink
             to="/cart"

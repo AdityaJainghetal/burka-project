@@ -72,9 +72,13 @@ const navItems = [
   { to: "/categories", label: "Categories", icon: Layers },
   { to: "/subcategories", label: "Sub-Categories", icon: LayoutGrid },
   { to: "/create", label: "Add Product", icon: PlusCircle },
+  { to: "/orders", label: "Orders", icon: LayoutGrid },
+  { to: "/allpayment", label: "AllPayment", icon: LayoutGrid },
+
+  { to: "/paymentdetail", label: "PaymentDetail", icon: LayoutGrid },
   { to: "/registration", label: "Registration", icon: UserPlus },
   { to: "/login", label: "Login", icon: LogIn },
-  { to: "/orders", label: "Orders", icon: LayoutGrid },
+  
 
 ];
 
